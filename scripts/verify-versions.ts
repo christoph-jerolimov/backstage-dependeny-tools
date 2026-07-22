@@ -91,6 +91,7 @@ console.log(`Manifest ${manifest.releaseVersion} contains ${manifestVersions.siz
 // plus a map of all resolved versions per package name.
 const resolvedBySelector = new Map<string, string>();
 const resolvedByName = new Map<string, Set<string>>();
+const lockEntries: { name: string; range: string; version: string }[] = [];
 {
   const lockfile = fs.readFileSync(path.join(projectRoot, 'yarn.lock'), 'utf8');
   let selectors: string[] = [];
@@ -116,6 +117,7 @@ const resolvedByName = new Map<string, Set<string>>();
         const name = selector.slice(0, atIndex);
         const range = selector.slice(atIndex + 1).replace(/^npm:/, '');
         resolvedBySelector.set(`${name}@${range}`, versionMatch[1]);
+        lockEntries.push({ name, range, version: versionMatch[1] });
         if (!resolvedByName.has(name)) {
           resolvedByName.set(name, new Set());
         }
@@ -141,6 +143,15 @@ for (const folder of ['packages', 'plugins']) {
 
 const rows: Row[] = [];
 let checked = 0;
+
+const resolvedStatus = (resolved: string, manifestVersion: string) => {
+  if (semver.valid(resolved) && semver.valid(manifestVersion)) {
+    return semver.gt(resolved, manifestVersion)
+      ? 'resolved newer than manifest'
+      : 'resolved older than manifest';
+  }
+  return 'resolved mismatch';
+};
 
 for (const packageJsonPath of packageJsonPaths) {
   const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, packageJsonPath), 'utf8'));
@@ -174,7 +185,7 @@ for (const packageJsonPath of packageJsonPaths) {
     if (!declaredMatches || !resolvedMatches) {
       const status = [
         ...(declaredMatches ? [] : ['declared mismatch']),
-        ...(resolvedMatches ? [] : [resolved ? 'resolved mismatch' : 'not in yarn.lock']),
+        ...(resolvedMatches ? [] : [resolved ? resolvedStatus(resolved, manifestVersion) : 'not in yarn.lock']),
       ].join(', ');
       rows.push({
         packageJson: packageJsonPath,
@@ -188,9 +199,34 @@ for (const packageJsonPath of packageJsonPaths) {
   }
 }
 
+// Additionally check every @backstage/ entry in the yarn.lock — including
+// transitive dependencies that appear in no package.json — for exactly the
+// version from the manifest.
+let lockChecked = 0;
+for (const { name, range, version } of lockEntries) {
+  if (!name.startsWith('@backstage/')) {
+    continue;
+  }
+  const manifestVersion = manifestVersions.get(name);
+  if (!manifestVersion) {
+    continue;
+  }
+  lockChecked++;
+  if (version !== manifestVersion) {
+    rows.push({
+      packageJson: 'yarn.lock',
+      dependency: name,
+      declared: range,
+      manifest: manifestVersion,
+      resolved: version,
+      status: resolvedStatus(version, manifestVersion),
+    });
+  }
+}
+
 console.log(
   `Checked ${checked} dependency declarations in ${packageJsonPaths.length} package.json files ` +
-    `against manifest ${manifest.releaseVersion}`,
+    `and ${lockChecked} @backstage/ yarn.lock entries against manifest ${manifest.releaseVersion}`,
 );
 
 if (rows.length === 0) {
