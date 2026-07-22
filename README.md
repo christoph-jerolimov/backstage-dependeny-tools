@@ -11,24 +11,15 @@ highest stable release.
 ## Setup
 
 The project uses yarn 4, bootstrapped from the committed
-`.yarn/releases/yarn-4.9.2.cjs` (no corepack required):
+`.yarn/releases/yarn-4.9.2.cjs`:
 
 ```sh
+git clone https://github.com/christoph-jerolimov/backstage-dependeny-tools.git
+cd backstage-dependeny-tools
 yarn install
 ```
 
 ## Scripts
-
-### `yarn copy-manifests [path-to-versions-clone]`
-
-Copies the `manifest.json` of every Backstage release from a local clone of
-[backstage/versions](https://github.com/backstage/versions) (default:
-`.clones/versions`) into the `manifests/` folder:
-
-- Skips all versions before 1.45.0 (including their `-next` prereleases).
-- Writes the latest `-next` prerelease to `manifests/next.json` when it is
-  newer (by semver) than the highest stable release, otherwise removes
-  `next.json`.
 
 ### `yarn verify-versions <project-path-or-package.json>`
 
