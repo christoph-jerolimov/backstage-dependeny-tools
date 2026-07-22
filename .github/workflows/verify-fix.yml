@@ -1,0 +1,95 @@
+name: Verify fix command
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
+
+jobs:
+  verify-fix:
+    name: ${{ matrix.repository }} / ${{ matrix.workspace }} @ ${{ matrix.commit }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repository: redhat-developer/rhdh-plugins
+            workspace: app-defaults
+            commit: ad69e3d29fa5cc831b3a78f8e75cae9116e79a7d
+            expectedErrors: 2
+    env:
+      WORKSPACE_DIR: .clones/${{ matrix.repository }}/workspaces/${{ matrix.workspace }}
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Checkout ${{ matrix.repository }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.commit }}
+          path: .clones/${{ matrix.repository }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The cloned repositories pin their yarn version via the packageManager
+      # field, which requires corepack.
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Install workspace dependencies
+        working-directory: ${{ env.WORKSPACE_DIR }}
+        run: yarn install --immutable
+
+      - name: Verify versions (expect ${{ matrix.expectedErrors }} errors)
+        run: |
+          set +e
+          yarn verify-versions "$WORKSPACE_DIR" 2>&1 | tee verify-before.log
+          set -e
+          errors=$(grep -oE '^[0-9]+ version mismatches found' verify-before.log | grep -oE '^[0-9]+' || echo 0)
+          if [ "$errors" -ne "${{ matrix.expectedErrors }}" ]; then
+            echo "Expected ${{ matrix.expectedErrors }} version mismatches but found $errors"
+            exit 1
+          fi
+          echo "Found the expected $errors version mismatches"
+
+      - name: Fix versions
+        run: yarn fix-versions "$WORKSPACE_DIR" --install
+
+      - name: Verify workspace lockfile is consistent
+        working-directory: ${{ env.WORKSPACE_DIR }}
+        run: yarn install --immutable
+
+      - name: Verify versions (expect zero errors)
+        run: yarn verify-versions "$WORKSPACE_DIR"
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: verify-fix
+    if: always()
+    steps:
+      - name: Print number of successful and failed checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          conclusions=$(gh api --paginate \
+            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs?per_page=100" \
+            --jq '.jobs[] | select(.name != "Summary") | .conclusion')
+          successful=$(grep -c '^success$' <<< "$conclusions" || true)
+          failed=$(grep -c '^failure$' <<< "$conclusions" || true)
+          {
+            echo "Successful checks: $successful"
+            echo "Failed checks: $failed"
+          } | tee "$GITHUB_STEP_SUMMARY"

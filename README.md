@@ -72,3 +72,13 @@ and
 [redhat-developer/rhdh-plugins](https://github.com/redhat-developer/rhdh-plugins)
 and runs `verify-versions` against each of them. A summary job prints the
 number of successful and failed checks afterwards.
+
+### [verify-fix](.github/workflows/verify-fix.yml)
+
+Runs on every pull request and manually via workflow dispatch. A
+non-fail-fast matrix clones plugin workspaces at pinned commits with a known
+number of version mismatches, then runs `verify-versions` (expecting exactly
+that number of errors), `fix-versions --install`, `yarn install --immutable`
+to prove the lockfile is consistent, and `verify-versions` again expecting
+zero errors. A summary job prints the number of successful and failed checks
+afterwards.
