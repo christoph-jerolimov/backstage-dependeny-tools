@@ -27,6 +27,15 @@ export interface Mismatch {
   status: string;
 }
 
+export interface LockPackage {
+  name: string;
+  version: string;
+  // The (npm: stripped) selector ranges that resolve to this entry.
+  ranges: string[];
+  dependencies: Record<string, string>;
+  external: boolean;
+}
+
 export interface Analysis {
   projectRoot: string;
   backstageVersion: string;
@@ -36,6 +45,7 @@ export interface Analysis {
   checkedDeclarations: number;
   checkedLockEntries: number;
   mismatches: Mismatch[];
+  lockPackages: LockPackage[];
 }
 
 export const findProjectRoot = (input: string): string => {
@@ -96,6 +106,7 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
   const resolvedBySelector = new Map<string, string>();
   const resolvedByName = new Map<string, Set<string>>();
   const lockEntries: { name: string; range: string; version: string }[] = [];
+  const lockPackages: LockPackage[] = [];
   {
     const lockfile = parseSyml(fs.readFileSync(path.join(projectRoot, 'yarn.lock'), 'utf8'));
     for (const [key, entry] of Object.entries(lockfile)) {
@@ -103,6 +114,13 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
       if (key === '__metadata' || typeof version !== 'string') {
         continue;
       }
+      const lockPackage: LockPackage = {
+        name: '',
+        version,
+        ranges: [],
+        dependencies: entry.dependencies ?? {},
+        external: typeof entry.resolution === 'string' && entry.resolution.includes('@npm:'),
+      };
       for (const selector of key.split(',').map((part) => part.trim())) {
         const atIndex = selector.indexOf('@', 1);
         if (atIndex === -1) {
@@ -110,12 +128,17 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
         }
         const name = selector.slice(0, atIndex);
         const range = selector.slice(atIndex + 1).replace(/^npm:/, '');
+        lockPackage.name = name;
+        lockPackage.ranges.push(range);
         resolvedBySelector.set(`${name}@${range}`, version);
         lockEntries.push({ name, range, version });
         if (!resolvedByName.has(name)) {
           resolvedByName.set(name, new Set());
         }
         resolvedByName.get(name)!.add(version);
+      }
+      if (lockPackage.name) {
+        lockPackages.push(lockPackage);
       }
     }
   }
@@ -196,14 +219,21 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
     }
     checkedLockEntries++;
     if (version !== manifestVersion) {
+      // When the selector range doesn't allow the manifest version (for
+      // example ^0.15.1 vs 0.17.2 - caret ranges don't cross minor versions
+      // on 0.x), the lockfile entry cannot be fixed with a resolution
+      // override - the declaring package.json has to change instead.
+      const declaredMatches = semver.satisfies(manifestVersion, range, { includePrerelease: true });
       mismatches.push({
         packageJson: 'yarn.lock',
         dependency: name,
         declared: range,
         manifest: manifestVersion,
         resolved: version,
-        declaredMatches: true,
-        status: resolvedStatus(version, manifestVersion),
+        declaredMatches,
+        status: declaredMatches
+          ? resolvedStatus(version, manifestVersion)
+          : `range incompatible with manifest, ${resolvedStatus(version, manifestVersion)}`,
       });
     }
   }
@@ -222,5 +252,6 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
     checkedDeclarations,
     checkedLockEntries,
     mismatches,
+    lockPackages,
   };
 };
