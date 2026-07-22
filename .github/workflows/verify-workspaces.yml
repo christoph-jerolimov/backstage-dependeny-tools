@@ -19,11 +19,39 @@ jobs:
       matrix:
         include:
           - repository: backstage/community-plugins
+            workspace: acr
+          - repository: backstage/community-plugins
+            workspace: analytics
+          - repository: backstage/community-plugins
+            workspace: argocd
+          - repository: backstage/community-plugins
+            workspace: bookmarks
+          - repository: backstage/community-plugins
+            workspace: jfrog-artifactory
+          - repository: backstage/community-plugins
+            workspace: mcp-chat
+          - repository: backstage/community-plugins
+            workspace: multi-source-security-viewer
+          - repository: backstage/community-plugins
+            workspace: nexus-repository-manager
+          - repository: backstage/community-plugins
+            workspace: npm
+          - repository: backstage/community-plugins
+            workspace: ocm
+          - repository: backstage/community-plugins
+            workspace: quay
+          - repository: backstage/community-plugins
             workspace: rbac
           - repository: backstage/community-plugins
             workspace: servicenow
+          - repository: backstage/community-plugins
+            workspace: tekton
+          - repository: backstage/community-plugins
+            workspace: topology
           - repository: redhat-developer/rhdh-plugins
             workspace: adoption-insights
+          - repository: redhat-developer/rhdh-plugins
+            workspace: app-defaults
           - repository: redhat-developer/rhdh-plugins
             workspace: bulk-import
           - repository: redhat-developer/rhdh-plugins
@@ -33,7 +61,7 @@ jobs:
           - repository: redhat-developer/rhdh-plugins
             workspace: homepage
           - repository: redhat-developer/rhdh-plugins
-            workspace: lightspeed
+            workspace: intelligent-assistant
           - repository: redhat-developer/rhdh-plugins
             workspace: orchestrator
           - repository: redhat-developer/rhdh-plugins
@@ -42,6 +70,8 @@ jobs:
             workspace: scorecard
           - repository: redhat-developer/rhdh-plugins
             workspace: theme
+          - repository: redhat-developer/rhdh-plugins
+            workspace: translations
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v4
