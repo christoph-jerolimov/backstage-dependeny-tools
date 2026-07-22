@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "copy-manifests": "tsx scripts/copy-manifests.ts"
+    "copy-manifests": "tsx scripts/copy-manifests.ts",
+    "verify-versions": "tsx scripts/verify-versions.ts"
   },
   "dependencies": {
     "semver": "^7.6.3",
