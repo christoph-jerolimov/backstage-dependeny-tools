@@ -139,6 +139,9 @@ const applyFixes = async (analysis: Analysis): Promise<{ actions: number; declar
     }
   }
 
+  const blockedOnUpstream = new Map<string, { mismatches: Set<string>; offenses: string[] }>();
+  const blockedOnTransitive = new Map<string, { mismatches: Set<string>; best: string }>();
+
   for (const [dependent, offenses] of dependentOffenses) {
     const available = await fetchVersions(dependent.name);
     const compatible = Object.keys(available)
@@ -150,10 +153,12 @@ const applyFixes = async (analysis: Analysis): Promise<{ actions: number; declar
       )
       .sort(semver.compare);
     if (compatible.length === 0) {
-      console.warn(
-        `${prefix}Cannot fix ${dependent.name}@${dependent.version}: no published version is ` +
-          `compatible with ${[...offenses.keys()].join(', ')} from the manifest.`,
-      );
+      // The dependent has no published version that works with the manifest
+      // - it has to release one before these mismatches can be fixed.
+      blockedOnUpstream.set(dependent.name, {
+        mismatches: new Set(offenses.keys()),
+        offenses: [...offenses.keys()],
+      });
       continue;
     }
 
@@ -176,13 +181,36 @@ const applyFixes = async (analysis: Analysis): Promise<{ actions: number; declar
           }
         }
         if (!declared) {
-          console.warn(
-            `${prefix}Cannot fix ${dependent.name}@${range}: the compatible version ${best} is outside ` +
-              `the range, which is declared by another dependency - that dependency needs an update.`,
-          );
+          // The range is declared by another dependency, so only an update
+          // of that dependency can move it.
+          const key = `${dependent.name}@${range}`;
+          if (!blockedOnTransitive.has(key)) {
+            blockedOnTransitive.set(key, { mismatches: new Set(offenses.keys()), best });
+          }
         }
       }
     }
+  }
+
+  const count = (n: number) => `${n} ${n === 1 ? 'mismatch' : 'mismatches'}`;
+  const blockedUpstreamCount = [...blockedOnUpstream.values()].reduce((sum, blocked) => sum + blocked.mismatches.size, 0);
+  const blockedTransitiveCount = [...blockedOnTransitive.values()].reduce((sum, blocked) => sum + blocked.mismatches.size, 0);
+  console.log(
+    `${prefix}Pass summary: ${actions} fixable, ` +
+      `${blockedUpstreamCount} blocked on upstream releases, ` +
+      `${blockedTransitiveCount} blocked on transitive dependencies`,
+  );
+  for (const [dependent, blocked] of blockedOnUpstream) {
+    console.warn(
+      `${prefix}- ${count(blocked.mismatches.size)} blocked because ${dependent} has not published a ` +
+        `version compatible with the manifest (${blocked.offenses.join(', ')})`,
+    );
+  }
+  for (const [descriptor, blocked] of blockedOnTransitive) {
+    console.warn(
+      `${prefix}- ${count(blocked.mismatches.size)} blocked because ${descriptor} is declared by ` +
+        `another dependency and only its update can move it to ${blocked.best}`,
+    );
   }
 
   return { actions, declaredChanges };
