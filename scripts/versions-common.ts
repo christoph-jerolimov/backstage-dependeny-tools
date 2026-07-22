@@ -196,14 +196,21 @@ export const analyzeProject = async (input: string): Promise<Analysis> => {
     }
     checkedLockEntries++;
     if (version !== manifestVersion) {
+      // When the selector range doesn't allow the manifest version (for
+      // example ^0.15.1 vs 0.17.2 - caret ranges don't cross minor versions
+      // on 0.x), the lockfile entry cannot be fixed with a resolution
+      // override - the declaring package.json has to change instead.
+      const declaredMatches = semver.satisfies(manifestVersion, range, { includePrerelease: true });
       mismatches.push({
         packageJson: 'yarn.lock',
         dependency: name,
         declared: range,
         manifest: manifestVersion,
         resolved: version,
-        declaredMatches: true,
-        status: resolvedStatus(version, manifestVersion),
+        declaredMatches,
+        status: declaredMatches
+          ? resolvedStatus(version, manifestVersion)
+          : `range incompatible with manifest, ${resolvedStatus(version, manifestVersion)}`,
       });
     }
   }

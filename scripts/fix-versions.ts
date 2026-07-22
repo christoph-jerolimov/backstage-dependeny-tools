@@ -67,8 +67,13 @@ for (const mismatch of declaredFixes) {
   }
 }
 
-// Correct mismatched lockfile resolutions. Entries whose declared range was
-// wrong are skipped — their new range is resolved by the yarn install below.
+// Correct mismatched lockfile resolutions. This is only valid when the
+// selector range allows the manifest version - forcing e.g. ^0.15.1 to
+// resolve to 0.17.2 would pretend an incompatible version is compatible.
+// Entries whose range doesn't allow the manifest version have to be fixed
+// in the declaring package.json: project-local declarations are rewritten
+// above and re-resolved by the yarn install below; ranges declared by
+// dependencies disappear once the packages that declare them are updated.
 const resolutionFixes = new Map<string, string>();
 for (const mismatch of mismatches) {
   if (mismatch.declaredMatches && mismatch.resolved && mismatch.resolved !== mismatch.manifest) {
@@ -78,6 +83,16 @@ for (const mismatch of mismatches) {
 }
 for (const [descriptor, version] of resolutionFixes) {
   run('yarn', ['set', 'resolution', descriptor, `npm:${version}`]);
+}
+
+const unfixable = mismatches.filter((mismatch) => mismatch.packageJson === 'yarn.lock' && !mismatch.declaredMatches);
+for (const mismatch of unfixable) {
+  console.warn(
+    `Cannot fix yarn.lock entry ${mismatch.dependency}@${mismatch.declared}: the range does not ` +
+      `allow the manifest version ${mismatch.manifest}. It resolves again after the declaring ` +
+      `package.json files are fixed and yarn install ran, or requires updating the dependency ` +
+      `that declares it.`,
+  );
 }
 
 if (declaredFixes.length > 0) {
