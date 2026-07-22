@@ -32,13 +32,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
+      - name: Enable corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Copy manifests
-        run: npm run copy-manifests -- .clones/versions
+        run: yarn copy-manifests .clones/versions
 
       - name: Commit and push changes
         run: |
