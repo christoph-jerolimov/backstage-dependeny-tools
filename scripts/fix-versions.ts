@@ -1,10 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import semver from 'semver';
-import { analyzeProject, type Analysis, type LockPackage } from './versions-common.ts';
+import { analyzeProject, planFixes, printFixPlan } from './versions-common.ts';
 
-// Fixes the version mismatches reported by verify-versions.ts:
+// Fixes the version mismatches reported by verify-versions.ts, applying the
+// fix plan from versions-common.ts:
 //
 // - Declared ranges in package.json files that don't match the manifest are
 //   rewritten to the manifest version, keeping the range style (^, ~ or an
@@ -42,178 +42,16 @@ if (!input) {
 
 const prefix = dryRun ? '[dry-run] ' : '';
 
-const packumentCache = new Map<string, Record<string, { dependencies?: Record<string, string> }>>();
-const fetchVersions = async (name: string) => {
-  if (!packumentCache.has(name)) {
-    const url = `https://registry.npmjs.org/${name.replace('/', '%2f')}`;
-    const response = await fetch(url, { headers: { accept: 'application/vnd.npm.install-v1+json' } });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
-    }
-    packumentCache.set(name, ((await response.json()) as { versions: {} }).versions);
+const runYarn = (projectRoot: string, yarnArgs: string[]) => {
+  console.log(`${prefix}$ yarn ${yarnArgs.join(' ')}`);
+  if (dryRun) {
+    return;
   }
-  return packumentCache.get(name)!;
-};
-
-const applyFixes = async (analysis: Analysis): Promise<{ actions: number; declaredChanges: number }> => {
-  const { projectRoot, mismatches, lockPackages } = analysis;
-  let actions = 0;
-  let declaredChanges = 0;
-
-  const run = (command: string, commandArgs: string[]) => {
-    console.log(`${prefix}$ ${command} ${commandArgs.join(' ')}`);
-    actions++;
-    if (dryRun) {
-      return;
-    }
-    const result = spawnSync(command, commandArgs, { cwd: projectRoot, stdio: 'inherit' });
-    if (result.status !== 0) {
-      console.error(`${command} failed with exit code ${result.status}`);
-      process.exit(1);
-    }
-  };
-
-  const updateDeclaration = (packageJsonPath: string, section: string, dependency: string, newRange: string) => {
-    console.log(`${prefix}${packageJsonPath}: ${dependency} (${section}) -> ${newRange}`);
-    actions++;
-    declaredChanges++;
-    if (dryRun) {
-      return;
-    }
-    const filePath = path.join(projectRoot, packageJsonPath);
-    const packageJson = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    packageJson[section][dependency] = newRange;
-    fs.writeFileSync(filePath, `${JSON.stringify(packageJson, null, 2)}\n`);
-  };
-
-  const styledRange = (oldRange: string, version: string) =>
-    /^[\^~]/.test(oldRange) ? `${oldRange[0]}${version}` : semver.valid(oldRange) ? version : `^${version}`;
-
-  // Rewrite declared ranges in the package.json files, keeping the range style.
-  const declaredFixes = mismatches.filter((mismatch) => mismatch.section && !mismatch.declaredMatches);
-  for (const mismatch of declaredFixes) {
-    updateDeclaration(
-      mismatch.packageJson,
-      mismatch.section!,
-      mismatch.dependency,
-      styledRange(mismatch.declared, mismatch.manifest),
-    );
+  const result = spawnSync('yarn', yarnArgs, { cwd: projectRoot, stdio: 'inherit' });
+  if (result.status !== 0) {
+    console.error(`yarn failed with exit code ${result.status}`);
+    process.exit(1);
   }
-
-  // Correct mismatched lockfile resolutions whose range allows the manifest
-  // version. Entries whose declared range was wrong are skipped - their new
-  // range is resolved by the yarn install below.
-  const resolutionFixes = new Map<string, string>();
-  for (const mismatch of mismatches) {
-    if (mismatch.declaredMatches && mismatch.resolved && mismatch.resolved !== mismatch.manifest) {
-      const range = mismatch.declared.replace(/^npm:/, '');
-      resolutionFixes.set(`${mismatch.dependency}@npm:${range}`, mismatch.manifest);
-    }
-  }
-  for (const [descriptor, version] of resolutionFixes) {
-    run('yarn', ['set', 'resolution', descriptor, `npm:${version}`]);
-  }
-
-  // Lockfile entries whose range cannot reach the manifest version are
-  // declared by dependencies that were built against an older Backstage
-  // release - bump those dependencies to their newest version whose
-  // @backstage/* ranges allow the manifest versions.
-  const unfixable = mismatches.filter((mismatch) => mismatch.packageJson === 'yarn.lock' && !mismatch.declaredMatches);
-  const dependentOffenses = new Map<LockPackage, Map<string, string>>();
-  for (const mismatch of unfixable) {
-    for (const lockPackage of lockPackages) {
-      const declaredRange = lockPackage.dependencies[mismatch.dependency]?.replace(/^npm:/, '');
-      if (declaredRange !== mismatch.declared) {
-        continue;
-      }
-      // Workspace packages declare their dependencies in the project's own
-      // package.json files - those are already handled above and re-synced
-      // by the next yarn install.
-      if (!lockPackage.external) {
-        continue;
-      }
-      if (!dependentOffenses.has(lockPackage)) {
-        dependentOffenses.set(lockPackage, new Map());
-      }
-      dependentOffenses.get(lockPackage)!.set(mismatch.dependency, mismatch.manifest);
-    }
-  }
-
-  const blockedOnUpstream = new Map<string, { mismatches: Set<string>; offenses: string[] }>();
-  const blockedOnTransitive = new Map<string, { mismatches: Set<string>; best: string }>();
-
-  for (const [dependent, offenses] of dependentOffenses) {
-    const available = await fetchVersions(dependent.name);
-    const compatible = Object.keys(available)
-      .filter((version) =>
-        [...offenses].every(([dependency, manifestVersion]) => {
-          const range = available[version].dependencies?.[dependency];
-          return range && semver.validRange(range) && semver.satisfies(manifestVersion, range, { includePrerelease: true });
-        }),
-      )
-      .sort(semver.compare);
-    if (compatible.length === 0) {
-      // The dependent has no published version that works with the manifest
-      // - it has to release one before these mismatches can be fixed.
-      blockedOnUpstream.set(dependent.name, {
-        mismatches: new Set(offenses.keys()),
-        offenses: [...offenses.keys()],
-      });
-      continue;
-    }
-
-    for (const range of dependent.ranges) {
-      const inRange = compatible.filter((version) => semver.satisfies(version, range, { includePrerelease: true }));
-      if (inRange.length > 0) {
-        run('yarn', ['set', 'resolution', `${dependent.name}@npm:${range}`, `npm:${inRange.at(-1)}`]);
-      } else {
-        // No compatible version within the selector range - the declaring
-        // package.json files have to move to a newer range.
-        const best = compatible.at(-1)!;
-        let declared = false;
-        for (const packageJsonPath of analysis.packageJsonPaths) {
-          const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, packageJsonPath), 'utf8'));
-          for (const section of ['dependencies', 'devDependencies']) {
-            if (packageJson[section]?.[dependent.name]?.replace(/^npm:/, '') === range) {
-              updateDeclaration(packageJsonPath, section, dependent.name, styledRange(range, best));
-              declared = true;
-            }
-          }
-        }
-        if (!declared) {
-          // The range is declared by another dependency, so only an update
-          // of that dependency can move it.
-          const key = `${dependent.name}@${range}`;
-          if (!blockedOnTransitive.has(key)) {
-            blockedOnTransitive.set(key, { mismatches: new Set(offenses.keys()), best });
-          }
-        }
-      }
-    }
-  }
-
-  const count = (n: number) => `${n} ${n === 1 ? 'mismatch' : 'mismatches'}`;
-  const blockedUpstreamCount = [...blockedOnUpstream.values()].reduce((sum, blocked) => sum + blocked.mismatches.size, 0);
-  const blockedTransitiveCount = [...blockedOnTransitive.values()].reduce((sum, blocked) => sum + blocked.mismatches.size, 0);
-  console.log(
-    `${prefix}Pass summary: ${actions} fixable, ` +
-      `${blockedUpstreamCount} blocked on upstream releases, ` +
-      `${blockedTransitiveCount} blocked on transitive dependencies`,
-  );
-  for (const [dependent, blocked] of blockedOnUpstream) {
-    console.warn(
-      `${prefix}- ${count(blocked.mismatches.size)} blocked because ${dependent} has not published a ` +
-        `version compatible with the manifest (${blocked.offenses.join(', ')})`,
-    );
-  }
-  for (const [descriptor, blocked] of blockedOnTransitive) {
-    console.warn(
-      `${prefix}- ${count(blocked.mismatches.size)} blocked because ${descriptor} is declared by ` +
-        `another dependency and only its update can move it to ${blocked.best}`,
-    );
-  }
-
-  return { actions, declaredChanges };
 };
 
 const maxPasses = 5;
@@ -225,8 +63,23 @@ for (let pass = 1; pass <= maxPasses; pass++) {
   }
 
   console.log(`${prefix}Fix pass ${pass}: ${analysis.mismatches.length} mismatches`);
-  const { actions, declaredChanges } = await applyFixes(analysis);
+  const plan = await planFixes(analysis);
 
+  for (const fix of plan.declaredFixes) {
+    console.log(`${prefix}${fix.packageJson}: ${fix.dependency} (${fix.section}) ${fix.from} -> ${fix.to}`);
+    if (!dryRun) {
+      const filePath = path.join(analysis.projectRoot, fix.packageJson);
+      const packageJson = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      packageJson[fix.section][fix.dependency] = fix.to;
+      fs.writeFileSync(filePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    }
+  }
+  for (const fix of plan.resolutionFixes) {
+    runYarn(analysis.projectRoot, ['set', 'resolution', fix.descriptor, `npm:${fix.version}`]);
+  }
+  printFixPlan(plan, 'Pass summary', prefix);
+
+  const actions = plan.declaredFixes.length + plan.resolutionFixes.length;
   if (dryRun) {
     console.log(`[dry-run] Planned ${actions} fixes for the first pass.`);
     process.exit(0);
@@ -235,20 +88,12 @@ for (let pass = 1; pass <= maxPasses; pass++) {
     console.error(`${analysis.mismatches.length} mismatches cannot be fixed automatically.`);
     process.exit(1);
   }
-  if (declaredChanges > 0 && !install) {
+  if (plan.declaredFixes.length > 0 && !install) {
     console.log('Declared ranges changed - run `yarn install` (or pass --install) to update the yarn.lock, then re-run this script.');
     process.exit(0);
   }
   if (install) {
-    console.log(`$ yarn install --no-immutable`);
-    const result = spawnSync('yarn', ['install', '--no-immutable'], {
-      cwd: analysis.projectRoot,
-      stdio: 'inherit',
-    });
-    if (result.status !== 0) {
-      console.error(`yarn install failed with exit code ${result.status}`);
-      process.exit(1);
-    }
+    runYarn(analysis.projectRoot, ['install', '--no-immutable']);
   }
 }
 

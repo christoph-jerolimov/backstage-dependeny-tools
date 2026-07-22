@@ -1,4 +1,4 @@
-import { analyzeProject, type Mismatch } from './versions-common.ts';
+import { analyzeProject, planFixes, printFixPlan, type Mismatch } from './versions-common.ts';
 
 // Verifies that a Backstage project uses the package versions of its
 // configured Backstage release.
@@ -54,6 +54,9 @@ const printTable = (mismatches: Mismatch[]) => {
 
 console.log();
 printTable(analysis.mismatches);
+console.log();
+const plan = await planFixes(analysis);
+printFixPlan(plan, 'Fix expectation');
 console.log();
 console.error(`${analysis.mismatches.length} version mismatches found.`);
 process.exit(1);
