@@ -14,7 +14,7 @@ import semver from 'semver';
 
 const MINIMUM_VERSION = '1.45.0';
 
-const versionsRepo = process.argv[2] ?? 'versions';
+const versionsRepo = process.argv[2] ?? '.clones/versions';
 const releasesDir = path.join(versionsRepo, 'v1', 'releases');
 const manifestsDir = 'manifests';
 
