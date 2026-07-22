@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "copy-manifests": "tsx scripts/copy-manifests.ts",
+    "fix-versions": "tsx scripts/fix-versions.ts",
     "verify-versions": "tsx scripts/verify-versions.ts"
   },
   "dependencies": {
