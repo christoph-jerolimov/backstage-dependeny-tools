@@ -8,6 +8,7 @@
     "verify-versions": "tsx scripts/verify-versions.ts"
   },
   "dependencies": {
+    "@yarnpkg/parsers": "^3.0.3",
     "semver": "^7.6.3",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0"

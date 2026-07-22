@@ -1,5 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { parseSyml } from '@yarnpkg/parsers';
 import semver from 'semver';
 
 // Verifies that a Backstage project uses the package versions of its
@@ -86,44 +87,31 @@ const manifest = await loadManifest(backstageVersion);
 const manifestVersions = new Map(manifest.packages.map((pkg) => [pkg.name, pkg.version]));
 console.log(`Manifest ${manifest.releaseVersion} contains ${manifestVersions.size} packages`);
 
-// Parses both yarn classic (version "1.2.3") and yarn berry (version: 1.2.3)
-// lockfiles into a map of "name@range" selectors to resolved versions,
-// plus a map of all resolved versions per package name.
+// Parses the (yarn berry) lockfile into a map of "name@range" selectors to
+// resolved versions, plus a map of all resolved versions per package name.
 const resolvedBySelector = new Map<string, string>();
 const resolvedByName = new Map<string, Set<string>>();
 const lockEntries: { name: string; range: string; version: string }[] = [];
 {
-  const lockfile = fs.readFileSync(path.join(projectRoot, 'yarn.lock'), 'utf8');
-  let selectors: string[] = [];
-  for (const rawLine of lockfile.split('\n')) {
-    const line = rawLine.trimEnd();
-    if (!line || line.startsWith('#')) {
+  const lockfile = parseSyml(fs.readFileSync(path.join(projectRoot, 'yarn.lock'), 'utf8'));
+  for (const [key, entry] of Object.entries(lockfile)) {
+    const version = entry?.version;
+    if (key === '__metadata' || typeof version !== 'string') {
       continue;
     }
-    if (!line.startsWith(' ') && line.endsWith(':')) {
-      selectors = line
-        .slice(0, -1)
-        .split(',')
-        .map((selector) => selector.trim().replace(/^"|"$/g, ''));
-      continue;
-    }
-    const versionMatch = line.match(/^ {2}version:?\s+"?([^"\s]+)"?$/);
-    if (versionMatch && selectors.length > 0) {
-      for (const selector of selectors) {
-        const atIndex = selector.indexOf('@', 1);
-        if (atIndex === -1) {
-          continue;
-        }
-        const name = selector.slice(0, atIndex);
-        const range = selector.slice(atIndex + 1).replace(/^npm:/, '');
-        resolvedBySelector.set(`${name}@${range}`, versionMatch[1]);
-        lockEntries.push({ name, range, version: versionMatch[1] });
-        if (!resolvedByName.has(name)) {
-          resolvedByName.set(name, new Set());
-        }
-        resolvedByName.get(name)!.add(versionMatch[1]);
+    for (const selector of key.split(',').map((part) => part.trim())) {
+      const atIndex = selector.indexOf('@', 1);
+      if (atIndex === -1) {
+        continue;
       }
-      selectors = [];
+      const name = selector.slice(0, atIndex);
+      const range = selector.slice(atIndex + 1).replace(/^npm:/, '');
+      resolvedBySelector.set(`${name}@${range}`, version);
+      lockEntries.push({ name, range, version });
+      if (!resolvedByName.has(name)) {
+        resolvedByName.set(name, new Set());
+      }
+      resolvedByName.get(name)!.add(version);
     }
   }
 }

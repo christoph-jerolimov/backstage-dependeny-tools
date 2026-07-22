@@ -93,3 +93,23 @@ jobs:
 
       - name: Verify versions
         run: npm run verify-versions -- .clones/${{ matrix.repository }}/workspaces/${{ matrix.workspace }}
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: verify
+    if: always()
+    steps:
+      - name: Print number of successful and failed checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          conclusions=$(gh api --paginate \
+            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs?per_page=100" \
+            --jq '.jobs[] | select(.name != "Summary") | .conclusion')
+          successful=$(grep -c '^success$' <<< "$conclusions" || true)
+          failed=$(grep -c '^failure$' <<< "$conclusions" || true)
+          {
+            echo "Successful checks: $successful"
+            echo "Failed checks: $failed"
+          } | tee "$GITHUB_STEP_SUMMARY"
