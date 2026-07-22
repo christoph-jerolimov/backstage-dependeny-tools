@@ -1,0 +1,65 @@
+name: Verify workspaces
+
+on:
+  workflow_dispatch:
+  pull_request:
+  schedule:
+    # Every morning at 04:17 UTC, one hour after the update-manifests workflow
+    - cron: '17 4 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: ${{ matrix.repository }} / ${{ matrix.workspace }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repository: backstage/community-plugins
+            workspace: rbac
+          - repository: backstage/community-plugins
+            workspace: servicenow
+          - repository: redhat-developer/rhdh-plugins
+            workspace: adoption-insights
+          - repository: redhat-developer/rhdh-plugins
+            workspace: bulk-import
+          - repository: redhat-developer/rhdh-plugins
+            workspace: extensions
+          - repository: redhat-developer/rhdh-plugins
+            workspace: global-header
+          - repository: redhat-developer/rhdh-plugins
+            workspace: homepage
+          - repository: redhat-developer/rhdh-plugins
+            workspace: lightspeed
+          - repository: redhat-developer/rhdh-plugins
+            workspace: orchestrator
+          - repository: redhat-developer/rhdh-plugins
+            workspace: quickstart
+          - repository: redhat-developer/rhdh-plugins
+            workspace: scorecard
+          - repository: redhat-developer/rhdh-plugins
+            workspace: theme
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Checkout ${{ matrix.repository }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          path: .clones/${{ matrix.repository }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify versions
+        run: npm run verify-versions -- .clones/${{ matrix.repository }}/workspaces/${{ matrix.workspace }}
