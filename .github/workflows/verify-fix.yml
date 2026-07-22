@@ -7,9 +7,6 @@ on:
 permissions:
   contents: read
 
-env:
-  COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
-
 jobs:
   verify-fix:
     name: ${{ matrix.repository }} / ${{ matrix.workspace }} @ ${{ matrix.commit }}
@@ -21,7 +18,7 @@ jobs:
           - repository: redhat-developer/rhdh-plugins
             workspace: app-defaults
             commit: ad69e3d29fa5cc831b3a78f8e75cae9116e79a7d
-            expectedErrors: 2
+            expectedMismatches: 2
     env:
       WORKSPACE_DIR: .clones/${{ matrix.repository }}/workspaces/${{ matrix.workspace }}
     steps:
@@ -40,11 +37,6 @@ jobs:
         with:
           node-version: 22
 
-      # The cloned repositories pin their yarn version via the packageManager
-      # field, which requires corepack.
-      - name: Enable corepack
-        run: corepack enable
-
       - name: Install dependencies
         run: yarn install --immutable
 
@@ -52,17 +44,17 @@ jobs:
         working-directory: ${{ env.WORKSPACE_DIR }}
         run: yarn install --immutable
 
-      - name: Verify versions (expect ${{ matrix.expectedErrors }} errors)
+      - name: Verify versions (expect ${{ matrix.expectedMismatches }} mismatches)
         run: |
           set +e
           yarn verify-versions "$WORKSPACE_DIR" 2>&1 | tee verify-before.log
           set -e
-          errors=$(grep -oE '^[0-9]+ version mismatches found' verify-before.log | grep -oE '^[0-9]+' || echo 0)
-          if [ "$errors" -ne "${{ matrix.expectedErrors }}" ]; then
-            echo "Expected ${{ matrix.expectedErrors }} version mismatches but found $errors"
+          mismatches=$(grep -oE '^[0-9]+ version mismatches found' verify-before.log | grep -oE '^[0-9]+' || echo 0)
+          if [ "$mismatches" -ne "${{ matrix.expectedMismatches }}" ]; then
+            echo "Expected ${{ matrix.expectedMismatches }} version mismatches but found $mismatches"
             exit 1
           fi
-          echo "Found the expected $errors version mismatches"
+          echo "Found the expected $mismatches version mismatches"
 
       - name: Fix versions
         run: yarn fix-versions "$WORKSPACE_DIR" --install
