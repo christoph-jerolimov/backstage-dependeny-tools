@@ -39,6 +39,9 @@ configured Backstage release:
   `package.json`.
 - Prints mismatches as a table and exits with code 1 if anything doesn't
   match.
+- Also prints a fix expectation - the same analysis `fix-versions` uses -
+  summarizing how many mismatches are fixable and how many are blocked,
+  grouped by the package that blocks them.
 
 ### `yarn fix-versions <project-path-or-package.json> [--dry-run] [--install]`
 
