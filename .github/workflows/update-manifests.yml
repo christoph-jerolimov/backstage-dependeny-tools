@@ -3,8 +3,8 @@ name: Update manifests
 on:
   workflow_dispatch:
   schedule:
-    # Every morning at 05:17 UTC (07:17 CEST / 06:17 CET)
-    - cron: '17 5 * * *'
+    # Every morning at 07:17 UTC (09:17 CEST / 08:17 CET)
+    - cron: '17 7 * * *'
 
 permissions:
   contents: write
