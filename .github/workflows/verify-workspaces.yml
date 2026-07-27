@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
   schedule:
-    # Every morning at 04:17 UTC, one hour after the update-manifests workflow
-    - cron: '17 4 * * *'
+    # Every workday (Mon-Fri) morning at 04:17 UTC, one hour after the update-manifests workflow
+    - cron: '17 4 * * 1-5'
 
 permissions:
   contents: read
