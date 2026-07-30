@@ -274,6 +274,32 @@ export interface FixPlan {
 export const styledRange = (oldRange: string, version: string) =>
   /^[\^~]/.test(oldRange) ? `${oldRange[0]}${version}` : semver.valid(oldRange) ? version : `^${version}`;
 
+// Progress indicator that rewrites a single status line on interactive
+// terminals and prints one plain line per step when piped (e.g. in CI).
+export const createProgress = (label: string, total: number) => {
+  const tty = process.stdout.isTTY === true;
+  let current = 0;
+  return {
+    step(detail: string) {
+      current++;
+      const text = `${label} [${current}/${total}] ${detail}`;
+      if (tty) {
+        process.stdout.write(`\r\x1b[2K${text}`);
+      } else {
+        console.log(text);
+      }
+    },
+    done(summary?: string) {
+      if (tty && current > 0) {
+        process.stdout.write('\r\x1b[2K');
+      }
+      if (summary) {
+        console.log(summary);
+      }
+    },
+  };
+};
+
 const packumentCache = new Map<string, Record<string, { dependencies?: Record<string, string> }>>();
 const fetchVersions = async (name: string) => {
   if (!packumentCache.has(name)) {
@@ -349,7 +375,9 @@ export const planFixes = async (analysis: Analysis): Promise<FixPlan> => {
     }
   }
 
+  const progress = createProgress('Checking npm registry', dependentOffenses.size);
   for (const [dependent, offenses] of dependentOffenses) {
+    progress.step(dependent.name);
     const available = await fetchVersions(dependent.name);
     const compatible = Object.keys(available)
       .filter((version) =>
@@ -401,6 +429,11 @@ export const planFixes = async (analysis: Analysis): Promise<FixPlan> => {
       }
     }
   }
+  progress.done(
+    dependentOffenses.size > 0
+      ? `Checked ${dependentOffenses.size} outdated ${dependentOffenses.size === 1 ? 'dependency' : 'dependencies'} on the npm registry`
+      : undefined,
+  );
 
   return plan;
 };

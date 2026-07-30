@@ -42,8 +42,8 @@ if (!input) {
 
 const prefix = dryRun ? '[dry-run] ' : '';
 
-const runYarn = (projectRoot: string, yarnArgs: string[]) => {
-  console.log(`${prefix}$ yarn ${yarnArgs.join(' ')}`);
+const runYarn = (projectRoot: string, yarnArgs: string[], counter = '') => {
+  console.log(`${prefix}${counter}$ yarn ${yarnArgs.join(' ')}`);
   if (dryRun) {
     return;
   }
@@ -62,11 +62,14 @@ for (let pass = 1; pass <= maxPasses; pass++) {
     process.exit(0);
   }
 
-  console.log(`${prefix}Fix pass ${pass}: ${analysis.mismatches.length} mismatches`);
+  console.log(`${prefix}Fix pass ${pass}/${maxPasses}: ${analysis.mismatches.length} mismatches`);
   const plan = await planFixes(analysis);
 
+  const totalFixes = plan.declaredFixes.length + plan.resolutionFixes.length;
+  let applied = 0;
+  const counter = () => `[${++applied}/${totalFixes}] `;
   for (const fix of plan.declaredFixes) {
-    console.log(`${prefix}${fix.packageJson}: ${fix.dependency} (${fix.section}) ${fix.from} -> ${fix.to}`);
+    console.log(`${prefix}${counter()}${fix.packageJson}: ${fix.dependency} (${fix.section}) ${fix.from} -> ${fix.to}`);
     if (!dryRun) {
       const filePath = path.join(analysis.projectRoot, fix.packageJson);
       const packageJson = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -75,7 +78,7 @@ for (let pass = 1; pass <= maxPasses; pass++) {
     }
   }
   for (const fix of plan.resolutionFixes) {
-    runYarn(analysis.projectRoot, ['set', 'resolution', fix.descriptor, `npm:${fix.version}`]);
+    runYarn(analysis.projectRoot, ['set', 'resolution', fix.descriptor, `npm:${fix.version}`], counter());
   }
   printFixPlan(plan, 'Pass summary', prefix);
 
