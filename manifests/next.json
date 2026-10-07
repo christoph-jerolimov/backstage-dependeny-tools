@@ -1,5 +1,5 @@
 {
-  "releaseVersion": "1.56.0-next.1",
+  "releaseVersion": "1.56.0-next.2",
   "requirements": {
     "node": "22 || 24"
   },
@@ -14,7 +14,7 @@
     },
     {
       "name": "@backstage/backend-defaults",
-      "version": "0.18.1-next.1"
+      "version": "0.18.1-next.2"
     },
     {
       "name": "@backstage/backend-dev-utils",
@@ -26,7 +26,7 @@
     },
     {
       "name": "@backstage/backend-openapi-utils",
-      "version": "0.7.3-next.1"
+      "version": "0.7.3-next.2"
     },
     {
       "name": "@backstage/backend-plugin-api",
@@ -102,7 +102,7 @@
     },
     {
       "name": "@backstage/cli-module-package-manager-yarn",
-      "version": "0.1.3-next.1"
+      "version": "0.1.3-next.2"
     },
     {
       "name": "@backstage/cli-module-scaffolder",
@@ -122,7 +122,7 @@
     },
     {
       "name": "@backstage/cli-node",
-      "version": "0.3.5-next.0"
+      "version": "0.3.5-next.1"
     },
     {
       "name": "@backstage/config",
@@ -146,7 +146,7 @@
     },
     {
       "name": "@backstage/core-components",
-      "version": "0.18.15-next.1"
+      "version": "0.18.15-next.2"
     },
     {
       "name": "@backstage/core-plugin-api",
@@ -154,7 +154,7 @@
     },
     {
       "name": "@backstage/create-app",
-      "version": "0.9.3-next.1"
+      "version": "0.9.3-next.2"
     },
     {
       "name": "@backstage/dev-utils",
@@ -202,7 +202,7 @@
     },
     {
       "name": "@backstage/integration",
-      "version": "2.1.3-next.0"
+      "version": "2.1.3-next.1"
     },
     {
       "name": "@backstage/integration-aws-node",
@@ -222,7 +222,7 @@
     },
     {
       "name": "@backstage/repo-tools",
-      "version": "0.19.2-next.1"
+      "version": "0.19.2-next.2"
     },
     {
       "name": "@techdocs/cli",
@@ -262,7 +262,7 @@
     },
     {
       "name": "@backstage/plugin-app-backend",
-      "version": "0.5.19-next.1"
+      "version": "0.5.19-next.2"
     },
     {
       "name": "@backstage/plugin-app-module-user-settings",
@@ -382,15 +382,15 @@
     },
     {
       "name": "@backstage/plugin-bitbucket-cloud-common",
-      "version": "0.3.14-next.0"
+      "version": "0.3.14-next.1"
     },
     {
       "name": "@backstage/plugin-catalog",
-      "version": "2.0.10-next.1"
+      "version": "2.0.10-next.2"
     },
     {
       "name": "@backstage/plugin-catalog-backend",
-      "version": "4.0.1-next.1"
+      "version": "4.0.1-next.2"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-ai-model",
@@ -426,7 +426,7 @@
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-gitea",
-      "version": "0.1.17-next.1"
+      "version": "0.1.17-next.2"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-github",
@@ -498,7 +498,7 @@
     },
     {
       "name": "@backstage/plugin-catalog-react",
-      "version": "3.2.4-next.0"
+      "version": "3.2.4-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-unprocessed-entities",
@@ -530,7 +530,7 @@
     },
     {
       "name": "@backstage/plugin-events-backend",
-      "version": "0.6.7-next.1"
+      "version": "0.6.7-next.2"
     },
     {
       "name": "@backstage/plugin-events-backend-module-aws-sqs",
@@ -594,7 +594,7 @@
     },
     {
       "name": "@backstage/plugin-kubernetes-backend",
-      "version": "0.21.12-next.1"
+      "version": "0.21.12-next.2"
     },
     {
       "name": "@backstage/plugin-kubernetes-cluster",
@@ -610,7 +610,7 @@
     },
     {
       "name": "@backstage/plugin-kubernetes-react",
-      "version": "0.6.1-next.0"
+      "version": "0.6.1-next.1"
     },
     {
       "name": "@backstage/plugin-mcp-actions-backend",
@@ -646,7 +646,7 @@
     },
     {
       "name": "@backstage/plugin-org",
-      "version": "0.7.10-next.0"
+      "version": "0.8.0-next.1"
     },
     {
       "name": "@backstage/plugin-org-react",
@@ -682,7 +682,7 @@
     },
     {
       "name": "@backstage/plugin-scaffolder",
-      "version": "1.39.1-next.0"
+      "version": "1.39.1-next.1"
     },
     {
       "name": "@backstage/plugin-scaffolder-backend",
@@ -726,7 +726,7 @@
     },
     {
       "name": "@backstage/plugin-scaffolder-backend-module-gitlab",
-      "version": "0.12.1-next.1"
+      "version": "0.12.1-next.2"
     },
     {
       "name": "@backstage/plugin-scaffolder-backend-module-notifications",
@@ -810,11 +810,11 @@
     },
     {
       "name": "@backstage/plugin-signals",
-      "version": "0.0.36-next.0"
+      "version": "0.0.36-next.1"
     },
     {
       "name": "@backstage/plugin-signals-backend",
-      "version": "0.3.20-next.1"
+      "version": "0.3.20-next.2"
     },
     {
       "name": "@backstage/plugin-signals-node",
@@ -826,7 +826,7 @@
     },
     {
       "name": "@backstage/plugin-techdocs",
-      "version": "1.19.0-next.0"
+      "version": "1.19.0-next.1"
     },
     {
       "name": "@backstage/plugin-techdocs-addons-test-utils",
@@ -834,11 +834,11 @@
     },
     {
       "name": "@backstage/plugin-techdocs-backend",
-      "version": "2.3.1-next.1"
+      "version": "2.4.0-next.2"
     },
     {
       "name": "@backstage/plugin-techdocs-common",
-      "version": "0.1.1"
+      "version": "0.1.2-next.0"
     },
     {
       "name": "@backstage/plugin-techdocs-module-addons-contrib",
@@ -846,11 +846,11 @@
     },
     {
       "name": "@backstage/plugin-techdocs-node",
-      "version": "2.0.2-next.1"
+      "version": "2.0.3-next.2"
     },
     {
       "name": "@backstage/plugin-techdocs-react",
-      "version": "1.3.16-next.1"
+      "version": "1.3.16-next.2"
     },
     {
       "name": "@backstage/plugin-user-settings",
