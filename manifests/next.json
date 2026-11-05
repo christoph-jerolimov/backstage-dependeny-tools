@@ -1,12 +1,12 @@
 {
-  "releaseVersion": "1.57.0-next.0",
+  "releaseVersion": "1.57.0-next.1",
   "requirements": {
-    "node": "22 || 24"
+    "node": "^24.15.0 || ^26.13.0"
   },
   "packages": [
     {
       "name": "@backstage/app-defaults",
-      "version": "1.7.14-next.0"
+      "version": "1.7.14-next.1"
     },
     {
       "name": "@backstage/backend-app-api",
@@ -14,7 +14,7 @@
     },
     {
       "name": "@backstage/backend-defaults",
-      "version": "0.18.2-next.0"
+      "version": "0.18.2-next.1"
     },
     {
       "name": "@backstage/backend-dev-utils",
@@ -22,7 +22,7 @@
     },
     {
       "name": "@backstage/backend-dynamic-feature-service",
-      "version": "0.8.9-next.0"
+      "version": "0.8.9-next.1"
     },
     {
       "name": "@backstage/backend-openapi-utils",
@@ -34,11 +34,11 @@
     },
     {
       "name": "@backstage/backend-test-utils",
-      "version": "1.11.9-next.0"
+      "version": "1.11.9-next.1"
     },
     {
       "name": "@backstage/catalog-client",
-      "version": "1.16.3"
+      "version": "1.16.4-next.0"
     },
     {
       "name": "@backstage/catalog-model",
@@ -46,7 +46,7 @@
     },
     {
       "name": "@backstage/cli",
-      "version": "0.36.8-next.0"
+      "version": "0.36.8-next.1"
     },
     {
       "name": "@backstage/cli-common",
@@ -66,11 +66,11 @@
     },
     {
       "name": "@backstage/cli-module-build",
-      "version": "0.1.10-next.0"
+      "version": "0.1.10-next.1"
     },
     {
       "name": "@backstage/cli-module-catalog",
-      "version": "0.2.1-next.0"
+      "version": "0.2.1-next.1"
     },
     {
       "name": "@backstage/cli-module-config",
@@ -94,19 +94,19 @@
     },
     {
       "name": "@backstage/cli-module-migrate",
-      "version": "0.2.3-next.0"
+      "version": "0.2.3-next.1"
     },
     {
       "name": "@backstage/cli-module-new",
-      "version": "0.1.9-next.0"
+      "version": "0.1.9-next.1"
     },
     {
       "name": "@backstage/cli-module-package-manager-yarn",
-      "version": "0.1.5-next.0"
+      "version": "0.1.5-next.1"
     },
     {
       "name": "@backstage/cli-module-scaffolder",
-      "version": "0.2.1-next.0"
+      "version": "0.2.1-next.1"
     },
     {
       "name": "@backstage/cli-module-search",
@@ -122,7 +122,7 @@
     },
     {
       "name": "@backstage/cli-node",
-      "version": "0.3.6-next.0"
+      "version": "0.3.6-next.1"
     },
     {
       "name": "@backstage/config",
@@ -138,11 +138,11 @@
     },
     {
       "name": "@backstage/core-app-api",
-      "version": "1.20.7-next.0"
+      "version": "1.20.7-next.1"
     },
     {
       "name": "@backstage/core-compat-api",
-      "version": "0.5.17-next.0"
+      "version": "0.5.17-next.1"
     },
     {
       "name": "@backstage/core-components",
@@ -150,11 +150,11 @@
     },
     {
       "name": "@backstage/core-plugin-api",
-      "version": "1.12.12-next.0"
+      "version": "1.12.12-next.1"
     },
     {
       "name": "@backstage/create-app",
-      "version": "0.9.4-next.0"
+      "version": "0.9.4-next.1"
     },
     {
       "name": "@backstage/dev-utils",
@@ -178,27 +178,27 @@
     },
     {
       "name": "@backstage/frontend-app-api",
-      "version": "0.16.10-next.0"
+      "version": "0.17.0-next.1"
     },
     {
       "name": "@backstage/frontend-defaults",
-      "version": "0.5.8-next.0"
+      "version": "0.5.8-next.1"
     },
     {
       "name": "@backstage/frontend-dev-utils",
-      "version": "0.1.8-next.0"
+      "version": "0.1.8-next.1"
     },
     {
       "name": "@backstage/frontend-dynamic-feature-loader",
-      "version": "0.1.18-next.0"
+      "version": "0.1.18-next.1"
     },
     {
       "name": "@backstage/frontend-plugin-api",
-      "version": "0.18.3-next.0"
+      "version": "0.19.0-next.1"
     },
     {
       "name": "@backstage/frontend-test-utils",
-      "version": "0.7.0-next.0"
+      "version": "0.7.0-next.1"
     },
     {
       "name": "@backstage/integration",
@@ -206,7 +206,7 @@
     },
     {
       "name": "@backstage/integration-aws-node",
-      "version": "0.2.3"
+      "version": "0.2.4-next.0"
     },
     {
       "name": "@backstage/integration-react",
@@ -218,7 +218,7 @@
     },
     {
       "name": "@backstage/release-manifests",
-      "version": "0.0.15"
+      "version": "0.0.16-next.0"
     },
     {
       "name": "@backstage/repo-tools",
@@ -226,7 +226,7 @@
     },
     {
       "name": "@techdocs/cli",
-      "version": "1.14.0-next.0"
+      "version": "1.14.1-next.0"
     },
     {
       "name": "@backstage/test-utils",
@@ -250,7 +250,7 @@
     },
     {
       "name": "@backstage/plugin-api-docs",
-      "version": "0.14.7-next.0"
+      "version": "0.14.7-next.1"
     },
     {
       "name": "@backstage/plugin-api-docs-module-protoc-gen-doc",
@@ -258,7 +258,7 @@
     },
     {
       "name": "@backstage/plugin-app",
-      "version": "0.5.5-next.0"
+      "version": "0.6.0-next.1"
     },
     {
       "name": "@backstage/plugin-app-backend",
@@ -266,7 +266,7 @@
     },
     {
       "name": "@backstage/plugin-app-module-user-settings",
-      "version": "0.1.4-next.0"
+      "version": "0.1.4-next.1"
     },
     {
       "name": "@backstage/plugin-app-node",
@@ -274,19 +274,19 @@
     },
     {
       "name": "@backstage/plugin-app-react",
-      "version": "0.2.9-next.0"
+      "version": "0.3.0-next.1"
     },
     {
       "name": "@backstage/plugin-app-visualizer",
-      "version": "0.2.10-next.0"
+      "version": "0.2.10-next.1"
     },
     {
       "name": "@backstage/plugin-auth",
-      "version": "0.1.14-next.0"
+      "version": "0.1.14-next.1"
     },
     {
       "name": "@backstage/plugin-auth-backend",
-      "version": "0.30.3-next.0"
+      "version": "0.30.3-next.1"
     },
     {
       "name": "@backstage/plugin-auth-backend-module-atlassian-provider",
@@ -374,7 +374,7 @@
     },
     {
       "name": "@backstage/plugin-auth-node",
-      "version": "0.7.8-next.0"
+      "version": "0.7.8-next.1"
     },
     {
       "name": "@backstage/plugin-auth-react",
@@ -386,23 +386,23 @@
     },
     {
       "name": "@backstage/plugin-catalog",
-      "version": "2.0.11-next.0"
+      "version": "2.0.11-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend",
-      "version": "4.0.3-next.0"
+      "version": "4.0.3-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-ai-model",
-      "version": "0.1.6-next.0"
+      "version": "0.1.6-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-aws",
-      "version": "0.4.30-next.0"
+      "version": "0.4.30-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-azure",
-      "version": "0.3.24-next.0"
+      "version": "0.3.24-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-backstage-openapi",
@@ -410,11 +410,11 @@
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-bitbucket-cloud",
-      "version": "0.5.17-next.0"
+      "version": "0.5.17-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-bitbucket-server",
-      "version": "0.5.17-next.0"
+      "version": "0.5.17-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-gcp",
@@ -430,23 +430,23 @@
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-github",
-      "version": "0.14.2-next.0"
+      "version": "0.14.2-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-github-org",
-      "version": "0.3.28-next.0"
+      "version": "0.3.28-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-gitlab",
-      "version": "0.8.10-next.0"
+      "version": "0.8.10-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-gitlab-org",
-      "version": "0.2.27-next.0"
+      "version": "0.2.27-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-incremental-ingestion",
-      "version": "0.9.1-next.0"
+      "version": "0.9.1-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-ldap",
@@ -454,7 +454,7 @@
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-logs",
-      "version": "0.1.28-next.0"
+      "version": "0.1.28-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-msgraph",
@@ -474,7 +474,7 @@
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-scaffolder-entity-model",
-      "version": "0.2.26-next.0"
+      "version": "0.2.26-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-backend-module-unprocessed",
@@ -486,23 +486,23 @@
     },
     {
       "name": "@backstage/plugin-catalog-graph",
-      "version": "0.6.10-next.0"
+      "version": "0.6.10-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-import",
-      "version": "0.13.20-next.0"
+      "version": "0.13.20-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-node",
-      "version": "2.2.7-next.0"
+      "version": "2.2.7-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-react",
-      "version": "4.0.0-next.0"
+      "version": "4.0.0-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-unprocessed-entities",
-      "version": "0.2.37-next.0"
+      "version": "0.2.37-next.1"
     },
     {
       "name": "@backstage/plugin-catalog-unprocessed-entities-common",
@@ -514,7 +514,7 @@
     },
     {
       "name": "@backstage/plugin-devtools",
-      "version": "0.1.45-next.0"
+      "version": "0.1.45-next.1"
     },
     {
       "name": "@backstage/plugin-devtools-backend",
@@ -526,55 +526,55 @@
     },
     {
       "name": "@backstage/plugin-devtools-react",
-      "version": "0.2.8-next.0"
+      "version": "0.2.8-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend",
-      "version": "0.6.8-next.0"
+      "version": "0.6.8-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-aws-sqs",
-      "version": "0.4.28-next.0"
+      "version": "0.4.28-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-azure",
-      "version": "0.2.37-next.0"
+      "version": "0.2.37-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-bitbucket-cloud",
-      "version": "0.2.37-next.0"
+      "version": "0.2.37-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-bitbucket-server",
-      "version": "0.1.18-next.0"
+      "version": "0.1.18-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-gerrit",
-      "version": "0.2.37-next.0"
+      "version": "0.2.37-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-github",
-      "version": "0.4.18-next.0"
+      "version": "0.4.18-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-gitlab",
-      "version": "0.3.18-next.0"
+      "version": "0.3.18-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-google-pubsub",
-      "version": "0.2.9-next.0"
+      "version": "0.2.9-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-module-kafka",
-      "version": "0.3.10-next.0"
+      "version": "0.3.10-next.1"
     },
     {
       "name": "@backstage/plugin-events-backend-test-utils",
-      "version": "0.1.61-next.0"
+      "version": "0.1.61-next.1"
     },
     {
       "name": "@backstage/plugin-events-node",
-      "version": "0.4.28-next.0"
+      "version": "0.5.0-next.1"
     },
     {
       "name": "@backstage/plugin-gateway-backend",
@@ -582,19 +582,19 @@
     },
     {
       "name": "@backstage/plugin-home",
-      "version": "0.9.12-next.0"
+      "version": "0.9.12-next.1"
     },
     {
       "name": "@backstage/plugin-home-react",
-      "version": "0.1.44-next.0"
+      "version": "0.1.44-next.1"
     },
     {
       "name": "@backstage/plugin-kubernetes",
-      "version": "0.12.25-next.0"
+      "version": "0.12.25-next.1"
     },
     {
       "name": "@backstage/plugin-kubernetes-backend",
-      "version": "0.21.13-next.0"
+      "version": "0.21.13-next.1"
     },
     {
       "name": "@backstage/plugin-kubernetes-cluster",
@@ -602,7 +602,7 @@
     },
     {
       "name": "@backstage/plugin-kubernetes-common",
-      "version": "0.9.15-next.0"
+      "version": "0.9.15-next.1"
     },
     {
       "name": "@backstage/plugin-kubernetes-node",
@@ -614,23 +614,23 @@
     },
     {
       "name": "@backstage/plugin-mcp-actions-backend",
-      "version": "0.2.4-next.0"
+      "version": "0.2.4-next.1"
     },
     {
       "name": "@backstage/plugin-mui-to-bui",
-      "version": "0.2.13-next.0"
+      "version": "0.2.13-next.1"
     },
     {
       "name": "@backstage/plugin-notifications",
-      "version": "0.6.2-next.0"
+      "version": "0.6.2-next.1"
     },
     {
       "name": "@backstage/plugin-notifications-backend",
-      "version": "0.6.11-next.0"
+      "version": "0.6.11-next.1"
     },
     {
       "name": "@backstage/plugin-notifications-backend-module-email",
-      "version": "0.3.27-next.0"
+      "version": "0.3.27-next.1"
     },
     {
       "name": "@backstage/plugin-notifications-backend-module-slack",
@@ -646,11 +646,11 @@
     },
     {
       "name": "@backstage/plugin-org",
-      "version": "0.8.1-next.0"
+      "version": "0.8.1-next.1"
     },
     {
       "name": "@backstage/plugin-org-react",
-      "version": "0.1.56-next.0"
+      "version": "0.1.56-next.1"
     },
     {
       "name": "@backstage/plugin-permission-backend",
@@ -682,11 +682,11 @@
     },
     {
       "name": "@backstage/plugin-scaffolder",
-      "version": "1.41.0-next.0"
+      "version": "1.41.0-next.1"
     },
     {
       "name": "@backstage/plugin-scaffolder-backend",
-      "version": "4.2.2-next.0"
+      "version": "4.3.0-next.1"
     },
     {
       "name": "@backstage/plugin-scaffolder-backend-module-azure",
@@ -750,11 +750,11 @@
     },
     {
       "name": "@backstage/plugin-scaffolder-common",
-      "version": "2.3.1"
+      "version": "2.4.0-next.0"
     },
     {
       "name": "@backstage/plugin-scaffolder-node",
-      "version": "0.13.9-next.0"
+      "version": "0.13.9-next.1"
     },
     {
       "name": "@backstage/plugin-scaffolder-node-test-utils",
@@ -762,11 +762,11 @@
     },
     {
       "name": "@backstage/plugin-scaffolder-react",
-      "version": "3.0.0-next.0"
+      "version": "3.0.0-next.1"
     },
     {
       "name": "@backstage/plugin-search",
-      "version": "1.7.10-next.0"
+      "version": "1.7.10-next.1"
     },
     {
       "name": "@backstage/plugin-search-backend",
@@ -774,11 +774,11 @@
     },
     {
       "name": "@backstage/plugin-search-backend-module-catalog",
-      "version": "0.3.21-next.0"
+      "version": "0.3.21-next.1"
     },
     {
       "name": "@backstage/plugin-search-backend-module-elasticsearch",
-      "version": "2.0.2-next.0"
+      "version": "2.0.2-next.1"
     },
     {
       "name": "@backstage/plugin-search-backend-module-explore",
@@ -794,7 +794,7 @@
     },
     {
       "name": "@backstage/plugin-search-backend-module-techdocs",
-      "version": "0.4.20-next.0"
+      "version": "0.4.20-next.1"
     },
     {
       "name": "@backstage/plugin-search-backend-node",
@@ -806,19 +806,19 @@
     },
     {
       "name": "@backstage/plugin-search-react",
-      "version": "1.11.10-next.0"
+      "version": "1.11.10-next.1"
     },
     {
       "name": "@backstage/plugin-signals",
-      "version": "0.0.37-next.0"
+      "version": "0.0.37-next.1"
     },
     {
       "name": "@backstage/plugin-signals-backend",
-      "version": "0.3.21-next.0"
+      "version": "0.3.21-next.1"
     },
     {
       "name": "@backstage/plugin-signals-node",
-      "version": "0.2.7-next.0"
+      "version": "0.2.7-next.1"
     },
     {
       "name": "@backstage/plugin-signals-react",
@@ -826,7 +826,7 @@
     },
     {
       "name": "@backstage/plugin-techdocs",
-      "version": "1.19.1-next.0"
+      "version": "1.19.1-next.1"
     },
     {
       "name": "@backstage/plugin-techdocs-addons-test-utils",
@@ -834,7 +834,7 @@
     },
     {
       "name": "@backstage/plugin-techdocs-backend",
-      "version": "2.4.1-next.0"
+      "version": "2.4.2-next.1"
     },
     {
       "name": "@backstage/plugin-techdocs-backend-module-zensical",
@@ -846,19 +846,19 @@
     },
     {
       "name": "@backstage/plugin-techdocs-module-addons-contrib",
-      "version": "1.1.42-next.0"
+      "version": "1.1.42-next.1"
     },
     {
       "name": "@backstage/plugin-techdocs-node",
-      "version": "2.2.0-next.0"
+      "version": "2.2.1-next.1"
     },
     {
       "name": "@backstage/plugin-techdocs-react",
-      "version": "1.4.1-next.0"
+      "version": "1.4.1-next.1"
     },
     {
       "name": "@backstage/plugin-user-settings",
-      "version": "0.9.9-next.0"
+      "version": "0.9.9-next.1"
     },
     {
       "name": "@backstage/plugin-user-settings-backend",
